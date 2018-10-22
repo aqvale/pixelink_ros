@@ -36,7 +36,7 @@ add_executable(pixelink_node
 set(EXEC_LIST pixelink_node)
 foreach(EXEC_FILE ${EXEC_LIST})
   target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} -lPxLApi)
-  add_dependencies(${EXEC_FILE} ${catkin_iEXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+  add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
   install(TARGETS ${EXEC_FILE}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endforeach(EXEC_FILE ${EXEC_LIST})
