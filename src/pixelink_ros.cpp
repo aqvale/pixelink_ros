@@ -9,7 +9,7 @@
 #include "pixelink_util.h"//My own stuff on top of the api
 
 #include <ros/ros.h>
-#include <image_transport/image_transport>
+#include <image_transport/image_transport.h>
 #include "pixelink_ros/setFrameRate.srv"
 #include "pixelink_ros/setROI.srv"
 #include "pixelink_ros/setOutputFormat.srv"

@@ -1,11 +1,12 @@
-//#include "PixeLINKApi.h"
+#pragma once
+#include "PixeLINKApi.h"
 #include <stdint.h>
 
-double getFrameRate(HANDLE hCamera);
-uint32_t* getROI(HANDLE hCamera);
-uint32_t* getPixelReductionRatio(HANDLE hCamera);
-uint32_t* getImageSize(HANDLE hCamera);
-uint32_t getWidth(HANDLE hCamera);
-uint32_t getHeight(HANDLE hCamera);
-uint32_t getBytesPerPixel(HANDLE hCamera);
-uint32_t getImageNumBytes(HANDLE hCamera);
+double getFrameRate(void* hCamera);
+uint32_t* getROI(void* hCamera);
+uint32_t* getPixelReductionRatio(void* hCamera);
+uint32_t* getImageSize(void* hCamera);
+uint32_t getWidth(void* hCamera);
+uint32_t getHeight(void* hCamera);
+uint32_t getBytesPerPixel(void* hCamera);
+uint32_t getImageNumBytes(void* hCamera);
