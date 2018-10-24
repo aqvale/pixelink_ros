@@ -1,6 +1,8 @@
-#include <vector.h>
+#include <vector>
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
+#include <cmath>
 
 //PixeLINK stuff
 #include "PixeLINKApi.h"
