@@ -2,16 +2,76 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <ros/ros.h>
+//PixeLINK stuff
 #include "PixeLINKApi.h"
-#include "pixelink_util.h"
+#include "pixelink_util.h"//My own stuff on top of the api
+
+#include <ros/ros.h>
 #include <image_transport/image_transport>
+#include "pixelink_ros/setFrameRate.srv"
+#include "pixelink_ros/setROI.srv"
+#include "pixelink_ros/setOutputFormat.srv"
+#include "pixelink_ros/setStreamFormat.srv"
 
 //Globals here
 float fps;
 int width, height, numBytes,count;
+char* outputFormat = "8UC3";
+uint32_t streamFormat = PIXEL_FORMAT_YUV422;
+HANDLE hCamera;
 
 //Insert services here
+bool callbackFrameRate(pixelink_ros::setFrameRate::Request& req, pixelink_ros::setFrameRate::Response& res){
+  // Check if requested framerate is reasonable
+  if(req.frameRate < 35 && req.frameRate>0){
+    if(setFrameRate(hCamera,req.frameRate)){
+      fps = req.frameRate;
+      res.success = true;
+      return true;
+    }
+  }
+  res.success=false;
+  return false;
+}
+
+bool callbackROI(pixelink_ros::setROI::Request& req, pixelink_ros::setROI::Response& res){
+  // Check roi vs max width, max height, min x and y offsets (ROI fits in possible window)
+  if(req.width+req.xOff<xMax && req.height+req.yOff<yMax && req.xOff>=0 && req.yOff>=0){
+    width = req.width;
+    height = req.height;
+    xOff = req.xOff;
+    yOff = req.yOff;
+    res.success = true;
+    return true;
+  }
+  res.success=false;
+  return false;
+}
+
+bool callbackStreamFormat(pixelink_ros::setStreamFormat::Request& req, pixelink_ros::setStreamFormat::Response& res){
+  //TODO: Define mappings in pixelink_util.h
+  //line 250 of PixeLINKTypes.h has the correct names
+  //Perhaps use the same strings as given by sensor messages image encodings definitions
+  if(valid){
+    if(setStreamFormat(hCamera,formatAsInteger)){
+      streamFormat = formatAsInteger;
+      res.success = true;
+      return true;
+    }
+  }
+  res.success = false;
+  return false;
+}
+
+bool callbackOutputFormat(pixelink_ros::setOutputFormat::Request& req, pixelink_ros::setOutputFormat::Response& res){
+  // TODO: Check if req.format is legal
+  res.success = legal;
+  if(legal){
+    encoding = req.format;//TODO: GET THE CONVERSION TO A CHAR ARRAY RIGHT
+    return true;
+  }
+  return false;
+}
 // Set fps (PxLSetStreamRate)
 /*
   uint64_t flags;
@@ -27,10 +87,10 @@ int main(int argc, char** argv){
   ros::init(argc,argv,"pixelink")
   ros::NodeHandle nh = new ros::NodeHandle();
   
+
   //Initialize Camera
   uint32_t nCameras = 0;
   uint32_t retCode = 0;
-  HANDLE hCamera;
   retCode = PxLGetNumberCameras(NULL, &nCameras);
   
   if(!API_SUCCESS(retCode) || nCameras<1){
@@ -57,6 +117,10 @@ int main(int argc, char** argv){
   //Initialize ROS image transport stuff
   image_transport::ImageTransport it(nh);
   image_transport::Publisher pub = it.advertise("image")
+  ros::ServiceClient frameRateClient = nh.serviceClient<pixelink_ros::setFrameRate>("/pixelink/setFrameRate");
+  ros::ServiceClient rOIClient = nh.serviceClient<pixelink_ros::setROI>("/pixelink/setROI");
+  ros::ServiceClient streamFormatClient = nh.serviceClient<pixelink_ros::setStreamFormat>("/pixelink/setStreamFormat");
+  ros::ServiceClient outputFormatClient = nh.serviceClient<pixelink_ros::setOutputFormat>("/pixelink/setOutputFormat");
 
   //Begin looping
   ros::Rate rate(fps);
@@ -74,7 +138,7 @@ int main(int argc, char** argv){
     msg->height = height;
     msg->step = width*3;//3 for rgba
     memcpy(&(msg.data[0]),&imageRGB[0],3*width*height);
-    msg->encoding = "8UC3";// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
+    msg->encoding = encoding;// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
     msg->is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;

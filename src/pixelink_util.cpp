@@ -6,6 +6,16 @@ double getFrameRate(HANDLE hCamera){
   uint32_t retCode = PxLGetFeature(hCamera,FEATURE_FRAME_RATE,&flags,1,&value);//defined in PixeLINKTypes.h
   return value;
 }
+bool setFrameRate(HANDLE hCamera, double value){
+  valueF = (float)value;
+  uint32_t retCode = PxLSetFeature(hCamera,FEATURE_FRAME_RATE,FEATURE_FLAG_MANUAL,1,&valueF);
+  return API_SUCCESS(retCode);
+}
+bool setStreamFormat(HANDLE hCamera, double value){
+  valueF = (float)value;
+  uint32_t retCode = PxLSetFeature(hCamera,FEATURE_PIXEL_FORMAT,FEATURE_FLAG_MANUAL,1,&value);
+  return API_SUCCESS(retCode);
+}
 uint32_t* getROI(HANDLE hCamera){
   float values[4];
   uint32_t roi[2];
