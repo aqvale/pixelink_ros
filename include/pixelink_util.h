@@ -1,8 +1,5 @@
 //#include "PixeLINKApi.h"
-#include <cmath>
-#include <math.h>
-#include <unistd.h>
-#include <cstdlib>
+#include <stdint.h>
 
 double getFrameRate(HANDLE hCamera);
 uint32_t* getROI(HANDLE hCamera);
