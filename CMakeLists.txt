@@ -10,15 +10,17 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
 )
 
+find_library(PXL_LIB PxLApi)
+
 catkin_package(CATKIN_DEPENDS
   std_msgs
   image_transport
   roscpp
 )
 
-execute_process(
-  COMMAND "cp " ${PROJECT_SOURCE_DIR}"/third_party/libPxLApi.so /usr/lib/libPxLApi.so"}
-)
+#execute_process(
+#  COMMAND "cp " ${PROJECT_SOURCE_DIR}"/third_party/libPxLApi.so /usr/lib/libPxLApi.so"}
+#)
 
 #########
 # BUILD #
@@ -26,16 +28,17 @@ execute_process(
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/third_party/include
 )
-
+add_definitions(-DPIXELINK_LINUX)
 
 add_executable(pixelink_node
                src/pixelink_ros.cpp
                src/pixelink_util.cpp)
-message(${catkin_LIBRARIES} -lPxLApi)
+message(${catkin_LIBRARIES} ${PXL_LIB})
 set(EXEC_LIST pixelink_node)
 foreach(EXEC_FILE ${EXEC_LIST})
-  target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} /usr/lib/libPxLApi.so)
+  target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} ${PXL_LIB})
   add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
   install(TARGETS ${EXEC_FILE}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
