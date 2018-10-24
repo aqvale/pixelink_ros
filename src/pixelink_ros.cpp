@@ -1,9 +1,11 @@
-#include <vector.h>
+#include <vector>
 #include <stdio.h>
 #include <time.h>
+#include <math.h>
+#include <cmath>
 
 #include <ros/ros.h>
-#include "PixeLINKApi.h"
+//#include "PixeLINKApi.h"
 #include "pixelink_util.h"
 #include <image_transport/image_transport>
 

@@ -32,10 +32,10 @@ include_directories(
 add_executable(pixelink_node
                src/pixelink_ros.cpp
                src/pixelink_util.cpp)
-
+message(${catkin_LIBRARIES} -lPxLApi)
 set(EXEC_LIST pixelink_node)
 foreach(EXEC_FILE ${EXEC_LIST})
-  target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} -lPxLApi)
+  target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} /usr/lib/libPxLApi.so)
   add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
   install(TARGETS ${EXEC_FILE}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
