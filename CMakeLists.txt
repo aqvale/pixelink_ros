@@ -8,14 +8,35 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   std_msgs
   roscpp
+  message_generation
 )
 
-find_library(PXL_LIB PxLApi)
+set(PXL_LIB ENV{PIXELINK_SDK_LIB})
+set(PXL_INC ENV{PIXELINK_SDK_INC})
+
+if(NOT ${PXL_LIB})
+  find_library(PXL_LIB PxLApi)
+endif(NOT ${PXL_LIB})
+if(NOT ${PXL_INC})
+  set(PXL_INC ${PROJECT_SOURCE_DIR}/third_party/include)
+endif(NOT ${PXL_INC})
+
+add_service_files(DIRECTORY srv FILES
+  setFrameRate.srv
+  setOutputFormat.srv
+  setROI.srv
+  setStreamFormat.srv
+)
+  
+generate_messages(DEPENDENCIES
+  std_msgs
+)
 
 catkin_package(CATKIN_DEPENDS
   std_msgs
   image_transport
   roscpp
+  message_runtime
 )
 
 #execute_process(
@@ -28,18 +49,18 @@ catkin_package(CATKIN_DEPENDS
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/include
-  ${PROJECT_SOURCE_DIR}/third_party/include
+  ${PXL_INC}
 )
 add_definitions(-DPIXELINK_LINUX)
 
 add_executable(pixelink_node
                src/pixelink_ros.cpp
                src/pixelink_util.cpp)
-message(${catkin_LIBRARIES} ${PXL_LIB})
+
 set(EXEC_LIST pixelink_node)
 foreach(EXEC_FILE ${EXEC_LIST})
   target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} ${PXL_LIB})
-  add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+  add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS} pixelink_ros_gencpp)
   install(TARGETS ${EXEC_FILE}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endforeach(EXEC_FILE ${EXEC_LIST})

@@ -10,23 +10,24 @@
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
-#include "pixelink_ros/setFrameRate.srv"
-#include "pixelink_ros/setROI.srv"
-#include "pixelink_ros/setOutputFormat.srv"
-#include "pixelink_ros/setStreamFormat.srv"
+#include "pixelink_ros/setFrameRate.h"
+#include "pixelink_ros/setROI.h"
+#include "pixelink_ros/setOutputFormat.h"
+#include "pixelink_ros/setStreamFormat.h"
 
 //Globals here
 float fps;
-int width, height, numBytes,count;
+int width, height, numBytes, count, xMax = 2448, yMax = 2048, xOff = 0, yOff = 0;
 char* outputFormat = "8UC3";
 uint32_t streamFormat = PIXEL_FORMAT_YUV422;
 HANDLE hCamera;
+PxlCamera cam;
 
 //Insert services here
 bool callbackFrameRate(pixelink_ros::setFrameRate::Request& req, pixelink_ros::setFrameRate::Response& res){
   // Check if requested framerate is reasonable
   if(req.frameRate < 35 && req.frameRate>0){
-    if(setFrameRate(hCamera,req.frameRate)){
+    if(cam.setFrameRate(req.frameRate)){
       fps = req.frameRate;
       res.success = true;
       return true;
@@ -55,7 +56,7 @@ bool callbackStreamFormat(pixelink_ros::setStreamFormat::Request& req, pixelink_
   //line 250 of PixeLINKTypes.h has the correct names
   //Perhaps use the same strings as given by sensor messages image encodings definitions
   if(valid){
-    if(setStreamFormat(hCamera,formatAsInteger)){
+    if(cam.setStreamFormat(hCamera,formatAsInteger)){
       streamFormat = formatAsInteger;
       res.success = true;
       return true;
@@ -92,7 +93,7 @@ int main(int argc, char** argv){
 
   //Initialize Camera
   uint32_t nCameras = 0;
-  uint32_t retCode = 0;
+  int retCode = 0;
   retCode = PxLGetNumberCameras(NULL, &nCameras);
   
   if(!API_SUCCESS(retCode) || nCameras<1){
@@ -106,11 +107,13 @@ int main(int argc, char** argv){
     return -1;
   }
 
+  cam = PxlCamera(hCamera);
+
   //Get camera parameters
-  fps = getFrameRate(hCamera);
-  width = getImageWidth(hCamera);
-  height = getImageHeight(hCamera);
-  numBytes = getImageNumBytes(hCamera);
+  fps = cam.getFrameRate();
+  width = cam.getImageWidth();
+  height = cam.getImageHeight();
+  numBytes = cam.getImageNumBytes();
   std::vector<uint8_t> frameBuf(numBytes);
   uint8_t* imageRGB[3*width*height];
 
