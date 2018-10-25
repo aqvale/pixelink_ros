@@ -1,0 +1,6 @@
+int32 width
+int32 height
+int32 xOff
+int32 yOff
+---
+bool success
