@@ -88,3 +88,46 @@ uint32_t PxlCamera::getImageNumBytes(){
   uint32_t numBytes = numPixels*bytesPerPixel;
   return numBytes;
 }
+std::set<StreamFormat> getStreamFormats(){
+  return streamFormats; 
+}
+std::string getAssocRosFormat(int pxlFormat){
+  set<StreamFormat>::iterator iter;
+  for(iter=streamFormats.begin();iter<streamFormats.end();iter++){
+    if(iter->getPxlFormat()==pxlFormat){
+      return iter->getRosFormat();
+    }
+  }
+  return std::string("");
+}
+int getAssocPxlFormat(std::string rosFormat){
+  set<StreamFormat>::iterator iter;
+  for(iter=streamFormats.begin();iter<streamFormats.end();iter++){
+    if((iter->getRosFormat()).compare(rosFormat)==0){
+      return iter->getPxlFormat();
+    }
+  }
+  return -1;
+}
+bool hasRosFormat(std::string rosFormat){
+  return getAssocPxlFormat(rosFormat) == 0;
+}
+bool hasPxlFormat(int pxlFormat){
+  return !(getAssocRosFormat(pxlFormat).empty());
+}
+bool hasFormat(StreamFormat sf){
+  return streamFormats.find(sf)<streamFormats.end();
+}
+
+
+StreamFormat::StreamFormat(){}
+StreamFormat::StreamFormat(int i, std::string s){
+  rosFormat = s;
+  pxlFormat = i;
+}
+StreamFormat::getPxlFormat(){
+  return pxlFormat;
+}
+StreamFormat::getRosFormat(){
+  return rosFormat;
+}

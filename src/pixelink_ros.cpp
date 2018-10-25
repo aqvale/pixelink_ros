@@ -18,8 +18,8 @@
 //Globals here
 float fps;
 int width, height, numBytes, count, xMax = 2448, yMax = 2048, xOff = 0, yOff = 0;
-char* outputFormat = "8UC3";
-uint32_t streamFormat = PIXEL_FORMAT_YUV422;
+char* outputFormat = std::get<1>(RGB24);
+uint32_t streamFormat = std::get<0>(YUV422);
 HANDLE hCamera;
 PxlCamera cam;
 
@@ -56,6 +56,7 @@ bool callbackStreamFormat(pixelink_ros::setStreamFormat::Request& req, pixelink_
   //line 250 of PixeLINKTypes.h has the correct names
   //Perhaps use the same strings as given by sensor messages image encodings definitions
   if(valid){
+    
     if(cam.setStreamFormat(hCamera,formatAsInteger)){
       streamFormat = formatAsInteger;
       res.success = true;
@@ -70,7 +71,7 @@ bool callbackOutputFormat(pixelink_ros::setOutputFormat::Request& req, pixelink_
   // TODO: Check if req.format is legal
   res.success = legal;
   if(legal){
-    encoding = req.format;//TODO: GET THE CONVERSION TO A CHAR ARRAY RIGHT
+    outputFormat = req.format;//TODO: GET THE CONVERSION TO A CHAR ARRAY RIGHT
     return true;
   }
   return false;
@@ -132,7 +133,7 @@ int main(int argc, char** argv){
   while(ros::ok()){
     // Get next frame
     FRAME_DESC* desc;
-    desc.uSize = sizeof(desc);
+    desc->uSize = sizeof(desc);
     retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],desc);
 
     // convert to image_transport
@@ -143,7 +144,7 @@ int main(int argc, char** argv){
     msg->height = height;
     msg->step = width*3;//3 for rgba
     memcpy(&(msg.data[0]),&imageRGB[0],3*width*height);
-    msg->encoding = encoding;// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
+    msg->encoding = outputFormat;// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
     msg->is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;
