@@ -11,6 +11,30 @@
 #define BAYER8 StreamFormat(PIXEL_FORMAT_BAYER8_GRBG,std::string("bayer_grbg8"));
 
 
+class StreamFormat{
+public:
+  StreamFormat();
+  StreamFormat(int i, std::string s);
+  ~StreamFormat();
+  int getPxlFormat();
+  std::string getRosFormat();
+  bool operator<(const StreamFormat& other) const{
+    int rosResult = rosFormat.compare(other.getRosFormat());
+    int pxlResult = pxlFormat - other.getPxlFormat();
+    if(rosResult > 0)
+      return max(rosResult,pxlResult);
+    else if(rosResult < 0)
+      return min(rosResult,pxlResult);
+    else if(pxlResult > 0)
+      return pxlResult;
+    else
+      return min(rosResult,pxlResult); // 0 if equal, negative otherwise
+  };
+private:
+  std::string rosFormat;
+  int pxlFormat;
+};
+
 
 class PxlCamera{
 public:
@@ -39,28 +63,4 @@ public:
 private:
   void* hCamera;
   std::set<StreamFormat> streamFormats{YUV422,RGB24,MONO8,MONO16,BAYER8};
-};
-
-class StreamFormat{
-public:
-  StreamFormat();
-  StreamFormat(int i, std::string s);
-  ~StreamFormat();
-  int getPxlFormat();
-  std::string getRosFormat();
-  bool operator<(const StreamFormat& other) const{
-    int rosResult = rosFormat.compare(other.getRosFormat());
-    int pxlResult = pxlFormat - other.getPxlFormat();
-    if(rosResult > 0)
-      return max(rosResult,pxlResult);
-    else if(rosResult < 0)
-      return min(rosResult,pxlResult);
-    else if(pxlResult > 0)
-      return pxlResult;
-    else
-      return min(rosResult,pxlResult); // 0 if equal, negative otherwise
-  }
-private:
-  std::string rosFormat;
-  int pxlFormat;
 };
