@@ -18,8 +18,8 @@
 //Globals here
 float fps;
 int width, height, numBytes, count, xMax = 2448, yMax = 2048, xOff = 0, yOff = 0;
-char* outputFormat = std::get<1>(RGB24);
-uint32_t streamFormat = std::get<0>(YUV422);
+StreamFormat outputFormat = RGB24.getRosFormat();
+StreamFormat cameraFormat = YUV422.getPxlFormat();
 HANDLE hCamera;
 PxlCamera cam;
 
@@ -40,25 +40,24 @@ bool callbackFrameRate(pixelink_ros::setFrameRate::Request& req, pixelink_ros::s
 bool callbackROI(pixelink_ros::setROI::Request& req, pixelink_ros::setROI::Response& res){
   // Check roi vs max width, max height, min x and y offsets (ROI fits in possible window)
   if(req.width+req.xOff<xMax && req.height+req.yOff<yMax && req.xOff>=0 && req.yOff>=0){
-    width = req.width;
-    height = req.height;
-    xOff = req.xOff;
-    yOff = req.yOff;
-    res.success = true;
-    return true;
+    float roi[4] = {xOff,yOff,width,height};
+    if(cam.setROI(roi)){
+      width = req.width;
+      height = req.height;
+      xOff = req.xOff;
+      yOff = req.yOff;
+      res.success = true;
+      return true;
+    }
   }
   res.success=false;
   return false;
 }
 
 bool callbackStreamFormat(pixelink_ros::setStreamFormat::Request& req, pixelink_ros::setStreamFormat::Response& res){
-  //TODO: Define mappings in pixelink_util.h
-  //line 250 of PixeLINKTypes.h has the correct names
-  //Perhaps use the same strings as given by sensor messages image encodings definitions
-  if(valid){
-    
-    if(cam.setStreamFormat(hCamera,formatAsInteger)){
-      streamFormat = formatAsInteger;
+  if(cam.hasRosFormat(req.format)){ // Setting stream format with a string
+    if(cam.setStreamFormat(hCamera,cam.getAssocPxlFormat(req.format))){
+      cameraFormat = StreamFormat::StreamFormat(cam.getAssocPxlFormat(req.format),req.format);
       res.success = true;
       return true;
     }
@@ -69,9 +68,10 @@ bool callbackStreamFormat(pixelink_ros::setStreamFormat::Request& req, pixelink_
 
 bool callbackOutputFormat(pixelink_ros::setOutputFormat::Request& req, pixelink_ros::setOutputFormat::Response& res){
   // TODO: Check if req.format is legal
+  bool legal = cam.hasRosFormat(req.format);
   res.success = legal;
   if(legal){
-    outputFormat = req.format;//TODO: GET THE CONVERSION TO A CHAR ARRAY RIGHT
+    outputFormat = StreamFormat::StreamFormat(req.format,cam.getAssocRosFormat(req.format));
     return true;
   }
   return false;
@@ -138,13 +138,13 @@ int main(int argc, char** argv){
 
     // convert to image_transport
     uint32_t bytesToWrite = 0;
-    retCode = PxLFormatImage(&frameBuf[0], &desc, IMAGE_FORMAT_RAW_RGB24, &imageRGB[0], &bytesToWrite);
+    retCode = PxLFormatImage(&frameBuf[0], &desc, cam.getAssocPxlFormat(outputFormat), &imageRGB[0], &bytesToWrite);
     sensor_msgs::ImagePtr msg;
     msg->width = width;
     msg->height = height;
     msg->step = width*3;//3 for rgba
     memcpy(&(msg.data[0]),&imageRGB[0],3*width*height);
-    msg->encoding = outputFormat;// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
+    msg->encoding = outputFormat.getRosFormat();// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
     msg->is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;
