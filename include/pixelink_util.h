@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <set>
 #include <math.h>
+#include <string>
 
 #define YUV422 StreamFormat(PIXEL_FORMAT_YUV422,std::string("yuv422"));
 #define RGB24 StreamFormat(PIXEL_FORMAT_RGB_NON_DIB,std::string("8UC3"));

@@ -148,7 +148,7 @@ int main(int argc, char** argv){
     msg->is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;
-    header.timestamp = ros::Time::now();
+    header.stamp = ros::Time::now();
     header.frame_id = "0";
     msg->header = header;
     // Send frame
