@@ -16,7 +16,6 @@ class StreamFormat{
 public:
   StreamFormat();
   StreamFormat(int i, std::string s);
-  ~StreamFormat();
   int getPxlFormat() const;
   std::string getRosFormat() const;
   bool operator<(const StreamFormat& other) const{
@@ -41,7 +40,6 @@ class PxlCamera{
 public:
   PxlCamera();
   PxlCamera(void* hCamera);
-  ~PxlCamera();
   void setHandle(void* hCamera);
   void* getHandle();
   double getFrameRate();

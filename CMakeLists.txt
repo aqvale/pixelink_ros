@@ -13,18 +13,14 @@ find_package(catkin REQUIRED COMPONENTS
 
 set(PXL_LIB_PATH $ENV{PIXELINK_SDK_LIB})
 set(PXL_INC $ENV{PIXELINK_SDK_INC})
-set(PXL_LIB "NOT FOUND")
 
-if(NOT ${PXL_LIB_PATH})
-  find_library(PXL_LIB PxLApi)
-else()
-  find_library(PXL_LIB PATHS ${PXL_LIB_PATH})
-endif()
+find_library(PXL_LIB PATHS ${PXL_LIB_PATH} NAMES PxLApi)
 if(NOT ${PXL_INC_PATH})
   set(PXL_INC ${PROJECT_SOURCE_DIR}/third_party/include)
 endif()
 
 message(${PXL_LIB})
+message(${PXL_LIB_PATH})
 message(${PXL_INC})
 
 add_service_files(DIRECTORY srv FILES
