@@ -88,35 +88,35 @@ uint32_t PxlCamera::getImageNumBytes(){
   uint32_t numBytes = numPixels*bytesPerPixel;
   return numBytes;
 }
-std::set<StreamFormat> getStreamFormats(){
+std::set<StreamFormat> PxlCamera::getStreamFormats(){
   return streamFormats; 
 }
-std::string getAssocRosFormat(int pxlFormat){
-  set<StreamFormat>::iterator iter;
-  for(iter=streamFormats.begin();iter<streamFormats.end();iter++){
+std::string PxlCamera::getAssocRosFormat(int pxlFormat){
+  std::set<StreamFormat>::iterator iter;
+  for(iter=streamFormats.begin();iter!=streamFormats.end();iter++){
     if(iter->getPxlFormat()==pxlFormat){
       return iter->getRosFormat();
     }
   }
   return std::string("");
 }
-int getAssocPxlFormat(std::string rosFormat){
-  set<StreamFormat>::iterator iter;
-  for(iter=streamFormats.begin();iter<streamFormats.end();iter++){
+int PxlCamera::getAssocPxlFormat(std::string rosFormat){
+  std::set<StreamFormat>::iterator iter;
+  for(iter=streamFormats.begin();iter!=streamFormats.end();iter++){
     if((iter->getRosFormat()).compare(rosFormat)==0){
       return iter->getPxlFormat();
     }
   }
   return -1;
 }
-bool hasRosFormat(std::string rosFormat){
+bool PxlCamera::hasRosFormat(std::string rosFormat){
   return getAssocPxlFormat(rosFormat) == 0;
 }
-bool hasPxlFormat(int pxlFormat){
+bool PxlCamera::hasPxlFormat(int pxlFormat){
   return !(getAssocRosFormat(pxlFormat).empty());
 }
-bool hasFormat(StreamFormat sf){
-  return streamFormats.find(sf)<streamFormats.end();
+bool PxlCamera::hasFormat(StreamFormat sf){
+  return streamFormats.find(sf)!=streamFormats.end();
 }
 
 
@@ -125,9 +125,9 @@ StreamFormat::StreamFormat(int i, std::string s){
   rosFormat = s;
   pxlFormat = i;
 }
-StreamFormat::getPxlFormat(){
+int StreamFormat::getPxlFormat() const{
   return pxlFormat;
 }
-StreamFormat::getRosFormat(){
+std::string StreamFormat::getRosFormat() const{
   return rosFormat;
 }

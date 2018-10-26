@@ -5,11 +5,11 @@
 #include <math.h>
 #include <string>
 
-#define YUV422 StreamFormat(PIXEL_FORMAT_YUV422,std::string("yuv422"));
-#define RGB24 StreamFormat(PIXEL_FORMAT_RGB_NON_DIB,std::string("8UC3"));
-#define MONO8 StreamFormat(PIXEL_FORMAT_MONO8,std::string("mono8"));
-#define MONO16 StreamFormat(PIXEL_FORMAT_MONO16,std::string("mono16"));
-#define BAYER8 StreamFormat(PIXEL_FORMAT_BAYER8_GRBG,std::string("bayer_grbg8"));
+#define YUV422 StreamFormat(PIXEL_FORMAT_YUV422,std::string("yuv422"))
+#define RGB24 StreamFormat(PIXEL_FORMAT_RGB24_NON_DIB,std::string("8UC3"))
+#define MONO8 StreamFormat(PIXEL_FORMAT_MONO8,std::string("mono8"))
+#define MONO16 StreamFormat(PIXEL_FORMAT_MONO16,std::string("mono16"))
+#define BAYER8 StreamFormat(PIXEL_FORMAT_BAYER8_GRBG,std::string("bayer_grbg8"))
 
 
 class StreamFormat{
@@ -17,19 +17,19 @@ public:
   StreamFormat();
   StreamFormat(int i, std::string s);
   ~StreamFormat();
-  int getPxlFormat();
-  std::string getRosFormat();
+  int getPxlFormat() const;
+  std::string getRosFormat() const;
   bool operator<(const StreamFormat& other) const{
     int rosResult = rosFormat.compare(other.getRosFormat());
     int pxlResult = pxlFormat - other.getPxlFormat();
     if(rosResult > 0)
-      return max(rosResult,pxlResult);
+      return std::max(rosResult,pxlResult);
     else if(rosResult < 0)
-      return min(rosResult,pxlResult);
+      return std::min(rosResult,pxlResult);
     else if(pxlResult > 0)
       return pxlResult;
     else
-      return min(rosResult,pxlResult); // 0 if equal, negative otherwise
+      return std::min(rosResult,pxlResult); // 0 if equal, negative otherwise
   };
 private:
   std::string rosFormat;

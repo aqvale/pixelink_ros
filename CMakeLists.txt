@@ -11,8 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-set(PXL_LIB ENV{PIXELINK_SDK_LIB})
-set(PXL_INC ENV{PIXELINK_SDK_INC})
+set(PXL_LIB $ENV{PIXELINK_SDK_LIB})
+set(PXL_INC $ENV{PIXELINK_SDK_INC})
 
 if(NOT ${PXL_LIB})
   find_library(PXL_LIB PxLApi)
