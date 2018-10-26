@@ -11,15 +11,21 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-set(PXL_LIB $ENV{PIXELINK_SDK_LIB})
+set(PXL_LIB_PATH $ENV{PIXELINK_SDK_LIB})
 set(PXL_INC $ENV{PIXELINK_SDK_INC})
+set(PXL_LIB "NOT FOUND")
 
-if(NOT ${PXL_LIB})
+if(NOT ${PXL_LIB_PATH})
   find_library(PXL_LIB PxLApi)
-endif(NOT ${PXL_LIB})
-if(NOT ${PXL_INC})
+else()
+  find_library(PXL_LIB PATHS ${PXL_LIB_PATH})
+endif()
+if(NOT ${PXL_INC_PATH})
   set(PXL_INC ${PROJECT_SOURCE_DIR}/third_party/include)
-endif(NOT ${PXL_INC})
+endif()
+
+message(${PXL_LIB})
+message(${PXL_INC})
 
 add_service_files(DIRECTORY srv FILES
   setFrameRate.srv
@@ -60,7 +66,7 @@ add_executable(pixelink_node
 set(EXEC_LIST pixelink_node)
 foreach(EXEC_FILE ${EXEC_LIST})
   target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} ${PXL_LIB})
-  add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS} pixelink_ros_gencpp)
+  add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
   install(TARGETS ${EXEC_FILE}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 endforeach(EXEC_FILE ${EXEC_LIST})
