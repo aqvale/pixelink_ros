@@ -39,9 +39,9 @@ private:
 class PxlCamera{
 public:
   PxlCamera();
-  PxlCamera(void* hCamera);
-  void setHandle(void* hCamera);
-  void* getHandle();
+  PxlCamera(HANDLE hCamera);
+  void setHandle(HANDLE hCamera);
+  HANDLE getHandle();
   double getFrameRate();
   bool setFrameRate(float value);
   bool setStreamFormat(float value);
@@ -60,6 +60,6 @@ public:
   bool hasPxlFormat(int pxlFormat);
   bool hasFormat(StreamFormat sf);
 private:
-  void* hCamera;
+  HANDLE hCamera;
   std::set<StreamFormat> streamFormats{YUV422,RGB24,MONO8,MONO16,BAYER8};
 };

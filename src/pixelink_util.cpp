@@ -2,13 +2,13 @@
 
 PxlCamera::PxlCamera(){
 }
-PxlCamera::PxlCamera(void* hCamera){
+PxlCamera::PxlCamera(HANDLE hCamera){
   this->hCamera = hCamera;
 }
-void PxlCamera::setHandle(void* hCamera){
+void PxlCamera::setHandle(HANDLE hCamera){
   this->hCamera = hCamera;
 }
-void* PxlCamera::getHandle(){
+HANDLE PxlCamera::getHandle(){
   return this->hCamera;
 }
 double PxlCamera::getFrameRate(){

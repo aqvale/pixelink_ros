@@ -10,6 +10,7 @@
 #include "pixelink_util.h"//My own stuff on top of the api
 
 #include <ros/ros.h>
+#include <sensor_msgs/Image.h>
 #include <image_transport/image_transport.h>
 #include "pixelink_ros/setFrameRate.h"
 #include "pixelink_ros/setROI.h"
@@ -91,67 +92,93 @@ bool callbackOutputFormat(pixelink_ros::setOutputFormat::Request& req, pixelink_
 int main(int argc, char** argv){
   ros::init(argc,argv,"pixelink");
   ros::NodeHandle nh;
-  
+  ROS_INFO("Initialized ROS");
 
   //Initialize Camera
   uint32_t nCameras = 0;
-  int retCode = 0;
-  retCode = PxLGetNumberCameras(NULL, &nCameras);
+  ROS_INFO("Camera Initialized");
+  std::vector<uint32_t> connectedList;
+  uint32_t retCode = 0;
+  ROS_INFO("Camera Initialized");
   
+  retCode = PxLGetNumberCameras(NULL, &nCameras);
   if(!API_SUCCESS(retCode) || nCameras<1){
     printf(" Error: No cameras found");
     return -1;
   }
-
-  retCode = PxLInitialize(0, &hCamera);
+  // These two lines are necessary b/c PxLGetNumberCameras CHECKS THE VECTOR SIZE BEFORE FILLING ID'S
+  connectedList.resize(nCameras);
+  ROS_INFO("Camera Initialized");
+  retCode = PxLGetNumberCameras(&connectedList[0],&nCameras);
+ROS_INFO("Camera Initialized");
+  retCode = PxLInitialize(connectedList[0], &hCamera);
+  ROS_INFO("Camera Initialized");
   if(!API_SUCCESS(retCode)){
-    printf(" Error: Camera initialization failed");
+    printf(" Error: Camera initialization failed with code %x\n",retCode);
     return -1;
   }
+  ROS_INFO("Camera Initialized");
 
   cam = PxlCamera(hCamera);
-
   //Get camera parameters
   fps = cam.getFrameRate();
   width = cam.getWidth();
+  ROS_INFO("Camera Initialized");
   height = cam.getHeight();
+  ROS_INFO("Camera Initialized");
   numBytes = cam.getImageNumBytes();
   std::vector<uint8_t> frameBuf(numBytes);
-  uint8_t* imageRGB[3*width*height];
+  ROS_INFO("Camera Initialized");
+  //uint8_t* imageRGB[3*width*height];
+  std::vector<uint8_t> imageRGB;
+  imageRGB.resize(3*width*height);
 
   ROS_INFO("Camera Initialized");
+  ROS_INFO_STREAM("Properties: FPS = "<<fps<<"\n\t\twidth = "<<width<<"\n\t\theight="<<height);
 
   //Initialize ROS image transport stuff
-  image_transport::ImageTransport it(nh);
-  image_transport::Publisher pub = it.advertise("image",2);
+  //image_transport::ImageTransport it(nh);
+  //image_transport::Publisher pub = it.advertise("image",2);
+  ros::Publisher pub = nh.advertise<sensor_msgs::Image>("image",2);
   ros::ServiceClient frameRateClient = nh.serviceClient<pixelink_ros::setFrameRate>("/pixelink/setFrameRate");
   ros::ServiceClient rOIClient = nh.serviceClient<pixelink_ros::setROI>("/pixelink/setROI");
   ros::ServiceClient streamFormatClient = nh.serviceClient<pixelink_ros::setStreamFormat>("/pixelink/setStreamFormat");
   ros::ServiceClient outputFormatClient = nh.serviceClient<pixelink_ros::setOutputFormat>("/pixelink/setOutputFormat");
+  ROS_INFO("ROS Image Transport publisher/services set up successfully");
 
   //Begin looping
   ros::Rate rate(fps);
   while(ros::ok()){
     // Get next frame
-    FRAME_DESC* desc;
-    desc->uSize = sizeof(desc);
-    retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],desc);
+    FRAME_DESC desc;
+    desc.uSize = sizeof(FRAME_DESC);
+    retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],&desc);
+    if(!API_SUCCESS(retCode)){
+      printf(" Error: Failed to obtain frame %x\n",retCode);
+      return -1;
+    }
 
     // convert to image_transport
     uint32_t bytesToWrite = 0;
-    retCode = PxLFormatImage(&frameBuf[0], desc, outputFormat.getPxlFormat(), &imageRGB[0], &bytesToWrite);
-    sensor_msgs::ImagePtr msg;
-    msg->width = width;
-    msg->height = height;
-    msg->step = width*3;//3 for rgba
-    memcpy(&(msg->data[0]),&imageRGB[0],3*width*height);
-    msg->encoding = outputFormat.getRosFormat();// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
-    msg->is_bigendian = 0;
+    retCode = PxLFormatImage(&frameBuf[0], &desc, outputFormat.getPxlFormat(), &imageRGB[0], &bytesToWrite);
+    if(!API_SUCCESS(retCode)){
+      printf(" Error: Failed to convert frame %x\n",retCode);
+      return -1;
+    }
+    ROS_INFO("GOT FRAME");
+    sensor_msgs::Image msg;
+    msg.width = width;
+    msg.height = height;
+    msg.step = width*3;//3 for rgba
+    msg.data.resize(msg.step*msg.height);
+    memcpy(&(msg.data[0]),&imageRGB[0],3*width*height);
+    msg.encoding = outputFormat.getRosFormat();// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
+    msg.is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;
     header.stamp = ros::Time::now();
     header.frame_id = "0";
-    msg->header = header;
+    msg.header = header;
     // Send frame
     pub.publish(msg);
 
