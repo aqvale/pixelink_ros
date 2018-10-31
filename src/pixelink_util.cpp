@@ -78,7 +78,20 @@ uint32_t PxlCamera::getBytesPerPixel(){
   uint32_t flags;
   uint32_t numVals = 1;
   int retCode = PxLGetFeature(hCamera,FEATURE_PIXEL_FORMAT,&flags,&numVals,&value);
-  return (uint32_t)value;
+  int retVal = 1;
+  // switch((uint32_t)value){
+  //   case BAYER8.getPxlFormat():
+  //   case MONO8.getPxlFormat():
+  //     retVal = 1;
+  //     break;
+  //   case YUV422.getPxlFormat():
+  //   case MONO16.getPxlFormat():
+  //     retVal = 2;
+  //     break;
+  //   case RGB24.getPxlFormat():
+  //     retVal = 3;
+  //     break;
+  return retVal;
 }
 uint32_t PxlCamera::getImageNumBytes(){
   uint32_t bytesPerPixel = getBytesPerPixel();

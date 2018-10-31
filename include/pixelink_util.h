@@ -9,7 +9,7 @@
 #define RGB24 StreamFormat(PIXEL_FORMAT_RGB24_NON_DIB,std::string("8UC3"))
 #define MONO8 StreamFormat(PIXEL_FORMAT_MONO8,std::string("mono8"))
 #define MONO16 StreamFormat(PIXEL_FORMAT_MONO16,std::string("mono16"))
-#define BAYER8 StreamFormat(PIXEL_FORMAT_BAYER8_GRBG,std::string("bayer_grbg8"))
+#define BAYER8 StreamFormat(PIXEL_FORMAT_BAYER8_RGGB,std::string("bayer_rggb8"))
 
 
 class StreamFormat{
