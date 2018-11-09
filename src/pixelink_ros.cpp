@@ -132,7 +132,7 @@ int main(int argc, char** argv){
   //Initialize ROS image transport stuff
   //image_transport::ImageTransport it(nh);
   //image_transport::Publisher pub = it.advertise("image",2);
-  ros::Publisher pub = nh.advertise<sensor_msgs::Image>("image",2);
+  ros::Publisher pub = nh.advertise<sensor_msgs::Image>("/pixelink/image",2);
   ros::ServiceClient frameRateClient = nh.serviceClient<pixelink_ros::setFrameRate>("/pixelink/setFrameRate");
   ros::ServiceClient rOIClient = nh.serviceClient<pixelink_ros::setROI>("/pixelink/setROI");
   ros::ServiceClient streamFormatClient = nh.serviceClient<pixelink_ros::setStreamFormat>("/pixelink/setStreamFormat");
@@ -160,7 +160,6 @@ int main(int argc, char** argv){
     //   printf(" Error: Failed to convert frame %x\n",retCode);
     //   return -1;
     // }
-    ROS_INFO("GOT FRAME");
     sensor_msgs::Image msg;
     msg.width = width;
     msg.height = height;
