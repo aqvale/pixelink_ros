@@ -24,16 +24,25 @@ bool PxlCamera::setFrameRate(float value){
   uint32_t retCode = PxLSetFeature(hCamera,FEATURE_FRAME_RATE,FEATURE_FLAG_MANUAL,numVals,&valueF);
   return API_SUCCESS(retCode);
 }
+bool PxlCamera::setBaseParams(){
+  const float exposure = 40;
+  const float gain = 11.4;
+  const float gamma = 2.18;
+  const float temp = 5000;
+  const float[3] balance= {1,1.062,3.352};// RGB
+  uint32_t numVals = 1;
+  int retCode = PxLSetFeature(hCamera,FEATURE_EXPOSURE,numVals,&exposure);
+  retCode = PxLSetFeature(hCamera,FEATURE_GAIN,numVals,&gain);
+  retCode = PxLSetFeature(hCamera,FEATURE_GAMMA,numVals,&gamma);
+  retCode = PxLSetFeature(hCamera,FEATURE_COLOR_TEMP,numVals,&temp);
+  numVals = 3;
+  retCode = PxLSetFeature(hCamera,FEATURE_WHITE_SHADING,numVals,&balance[0]);
+  return API_SUCCESS(retCode);
+}
 bool PxlCamera::setStreamFormat(float value){
   uint32_t numVals = 1;
   const float format = value;
   int retCode = PxLSetFeature(hCamera,FEATURE_PIXEL_FORMAT,FEATURE_FLAG_MANUAL,numVals,&format);
-  return API_SUCCESS(retCode);
-}
-bool PxlCamera::setROI(float* values){
-  const float* roi = values;
-  uint32_t numVals = 4;
-  int retCode = PxLSetFeature(hCamera,FEATURE_ROI,FEATURE_FLAG_MANUAL,numVals,&roi[0]);
   return API_SUCCESS(retCode);
 }
 void PxlCamera::getROI(uint32_t* roi){
@@ -44,6 +53,12 @@ void PxlCamera::getROI(uint32_t* roi){
   for(int i = 0;i<4;i++){
     roi[i] = (uint32_t)values[i];
   }
+}
+bool PxlCamera::setROI(float* values){
+  const float* roi = values;
+  uint32_t numVals = 4;
+  int retCode = PxLSetFeature(hCamera,FEATURE_ROI,FEATURE_FLAG_MANUAL,numVals,&roi[0]);
+  return API_SUCCESS(retCode);
 }
 void PxlCamera::getPixelReductionRatio(uint32_t* addressing){
   float values[4];

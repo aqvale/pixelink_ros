@@ -115,6 +115,7 @@ int main(int argc, char** argv){
   retCode = PxLSetStreamState (hCamera, STOP_STREAM);
 
   cam = PxlCamera(hCamera);
+  cam.setBaseParams();
   //Get camera parameters
   fps = cam.getFrameRate();
   width = cam.getWidth();

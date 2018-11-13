@@ -43,6 +43,7 @@ public:
   void setHandle(HANDLE hCamera);
   HANDLE getHandle();
   double getFrameRate();
+  bool setBaseParams();
   bool setFrameRate(float value);
   bool setStreamFormat(float value);
   bool setROI(float* values);
