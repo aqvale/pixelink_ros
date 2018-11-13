@@ -29,14 +29,14 @@ bool PxlCamera::setBaseParams(){
   const float gain = 11.4;
   const float gamma = 2.18;
   const float temp = 5000;
-  const float[3] balance= {1,1.062,3.352};// RGB
+  const float balance[3] = {1,1.062,3.352};// RGB
   uint32_t numVals = 1;
-  int retCode = PxLSetFeature(hCamera,FEATURE_EXPOSURE,numVals,&exposure);
-  retCode = PxLSetFeature(hCamera,FEATURE_GAIN,numVals,&gain);
-  retCode = PxLSetFeature(hCamera,FEATURE_GAMMA,numVals,&gamma);
-  retCode = PxLSetFeature(hCamera,FEATURE_COLOR_TEMP,numVals,&temp);
+  int retCode = PxLSetFeature(hCamera,FEATURE_EXPOSURE,FEATURE_FLAG_MANUAL,numVals,&exposure);
+  retCode = PxLSetFeature(hCamera,FEATURE_GAIN,FEATURE_FLAG_MANUAL,numVals,&gain);
+  retCode = PxLSetFeature(hCamera,FEATURE_GAMMA,FEATURE_FLAG_MANUAL,numVals,&gamma);
+  retCode = PxLSetFeature(hCamera,FEATURE_COLOR_TEMP,FEATURE_FLAG_MANUAL,numVals,&temp);
   numVals = 3;
-  retCode = PxLSetFeature(hCamera,FEATURE_WHITE_SHADING,numVals,&balance[0]);
+  retCode = PxLSetFeature(hCamera,FEATURE_WHITE_SHADING,FEATURE_FLAG_MANUAL,numVals,&balance[0]);
   return API_SUCCESS(retCode);
 }
 bool PxlCamera::setStreamFormat(float value){
