@@ -45,13 +45,20 @@ bool PxlCamera::setStreamFormat(float value){
   int retCode = PxLSetFeature(hCamera,FEATURE_PIXEL_FORMAT,FEATURE_FLAG_MANUAL,numVals,&format);
   return API_SUCCESS(retCode);
 }
+float PxlCamera::getFocalLength(){
+  float value;
+  uint32_t flags;
+  uint32_t numVals = 1;
+  int retCode = PxLGetFeature(hCamera,FEATURE_FOCUS,&flags,&numVals,&value);
+  return value;
+}
 void PxlCamera::getROI(uint32_t* roi){
   float values[4];
   uint32_t flags;
   uint32_t numVals = 4;
   int retCode = PxLGetFeature(hCamera,FEATURE_ROI,&flags,&numVals,&values[0]);
   for(int i = 0;i<4;i++){
-    roi[i] = (uint32_t)values[i];
+    roi[i] = (uint32_t)values[i];// First two are offset, last two are size
   }
 }
 bool PxlCamera::setROI(float* values){

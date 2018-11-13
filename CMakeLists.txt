@@ -28,6 +28,8 @@ add_service_files(DIRECTORY srv FILES
   setOutputFormat.srv
   setROI.srv
   setStreamFormat.srv
+  getROI.srv
+  getFocus.srv
 )
   
 generate_messages(DEPENDENCIES

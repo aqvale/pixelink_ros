@@ -47,6 +47,7 @@ public:
   bool setFrameRate(float value);
   bool setStreamFormat(float value);
   bool setROI(float* values);
+  float getFocalLength();
   void getROI(uint32_t* roi);
   void getPixelReductionRatio(uint32_t* addressing);
   void getImageSize(uint32_t* size);

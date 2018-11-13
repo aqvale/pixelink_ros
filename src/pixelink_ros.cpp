@@ -16,6 +16,8 @@
 #include "pixelink_ros/setROI.h"
 #include "pixelink_ros/setOutputFormat.h"
 #include "pixelink_ros/setStreamFormat.h"
+#include "pixelink_ros/getFocus.h"
+#include "pixelink_ros/getROI.h"
 
 //Globals here
 float fps;
@@ -39,7 +41,7 @@ bool callbackFrameRate(pixelink_ros::setFrameRate::Request& req, pixelink_ros::s
   return false;
 }
 
-bool callbackROI(pixelink_ros::setROI::Request& req, pixelink_ros::setROI::Response& res){
+bool callbackSetROI(pixelink_ros::setROI::Request& req, pixelink_ros::setROI::Response& res){
   // Check roi vs max width, max height, min x and y offsets (ROI fits in possible window)
   if(req.width+req.xOff<xMax && req.height+req.yOff<yMax && req.xOff>=0 && req.yOff>=0){
     float roi[4] = {(float)xOff,(float)yOff,(float)width,(float)height};
@@ -78,15 +80,22 @@ bool callbackOutputFormat(pixelink_ros::setOutputFormat::Request& req, pixelink_
   }
   return false;
 }
-// Set fps (PxLSetStreamRate)
-/*
-  uint64_t flags;
-  float value;
-  retCode = PxLGetFeature(hCamera,FEATURE_IRIS,&flags,1,&value);//defined in PixeLINKTypes.h
-  PxLSetFeature(hCamera,FEATURE_IRIS,FEATURE_FLAG_MANUAL,1,&value);
-*/
-// Set size of image
-// Set other various parameters
+
+bool callbackFocus(pixelink_ros::getFocus::Request& req, pixelink_ros::getFocus::Response& res){
+  ROS_INFO("CALL ME");
+  res.focus = cam.getFocalLength();
+  return true;
+}
+
+bool callbackGetROI(pixelink_ros::getROI::Request& req, pixelink_ros::getROI::Response& res){
+  uint32_t roi[4];
+  cam.getROI(&roi[0]);
+  for(int i=0;i<2;i++){
+    res.size[i] = roi[2+i];
+    res.offset[i] = roi[i];
+  }
+  return true;
+}
 
 //Main code
 int main(int argc, char** argv){
@@ -134,12 +143,19 @@ int main(int argc, char** argv){
   //image_transport::ImageTransport it(nh);
   //image_transport::Publisher pub = it.advertise("image",2);
   ros::Publisher pub = nh.advertise<sensor_msgs::Image>("/pixelink/image",2);
-  ros::ServiceClient frameRateClient = nh.serviceClient<pixelink_ros::setFrameRate>("/pixelink/setFrameRate");
-  ros::ServiceClient rOIClient = nh.serviceClient<pixelink_ros::setROI>("/pixelink/setROI");
-  ros::ServiceClient streamFormatClient = nh.serviceClient<pixelink_ros::setStreamFormat>("/pixelink/setStreamFormat");
-  ros::ServiceClient outputFormatClient = nh.serviceClient<pixelink_ros::setOutputFormat>("/pixelink/setOutputFormat");
-  ROS_INFO("ROS Image Transport publisher/services set up successfully");
+  ros::ServiceServer frameRateServer = nh.advertiseService("/pixelink/setFrameRate",callbackFrameRate);
+  ros::ServiceServer setROIServer = nh.advertiseService("/pixelink/setROI",callbackSetROI);
+  ros::ServiceServer streamFormatServer = nh.advertiseService("/pixelink/setStreamFormat",callbackStreamFormat);
+  ros::ServiceServer outputFormatServer = nh.advertiseService("/pixelink/setOutputFormat",callbackOutputFormat);
+  ros::ServiceServer focusServer = nh.advertiseService("/pixelink/getFocus",callbackFocus);
+  ros::ServiceServer getROIServer = nh.advertiseService("/pixelink/getROI",callbackGetROI);
 
+  ros::ServiceClient focusClient = nh.serviceClient<pixelink_ros::getFocus>("/pixelink/getFocus");
+  pixelink_ros::getFocus srv;
+  focusClient.call(srv);
+  ROS_INFO_STREAM("Focus is " << srv.response.focus);
+  ROS_INFO("ROS Image Transport publisher/services set up successfully");
+  
   //Begin looping
   ros::Rate rate(fps);
   while(ros::ok()){
