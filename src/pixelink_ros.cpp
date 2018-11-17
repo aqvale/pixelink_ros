@@ -82,7 +82,6 @@ bool callbackOutputFormat(pixelink_ros::setOutputFormat::Request& req, pixelink_
 }
 
 bool callbackFocus(pixelink_ros::getFocus::Request& req, pixelink_ros::getFocus::Response& res){
-  ROS_INFO("CALL ME");
   res.focus = cam.getFocalLength();
   return true;
 }
@@ -150,10 +149,10 @@ int main(int argc, char** argv){
   ros::ServiceServer focusServer = nh.advertiseService("/pixelink/getFocus",callbackFocus);
   ros::ServiceServer getROIServer = nh.advertiseService("/pixelink/getROI",callbackGetROI);
 
-  ros::ServiceClient focusClient = nh.serviceClient<pixelink_ros::getFocus>("/pixelink/getFocus");
-  pixelink_ros::getFocus srv;
-  focusClient.call(srv);
-  ROS_INFO_STREAM("Focus is " << srv.response.focus);
+  // ros::ServiceClient focusClient = nh.serviceClient<pixelink_ros::getFocus>("/pixelink/getFocus");
+  // pixelink_ros::getFocus srv;
+  // focusClient.call(srv);
+  // ROS_INFO_STREAM("Focus is " << srv.response.focus);
   ROS_INFO("ROS Image Transport publisher/services set up successfully");
   
   //Begin looping
@@ -192,7 +191,7 @@ int main(int argc, char** argv){
     msg.header = header;
     // Send frame
     pub.publish(msg);
-
+    ros::spinOnce();
 
     rate.sleep();
   }
