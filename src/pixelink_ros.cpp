@@ -34,7 +34,7 @@ bool callbackFrameRate(pixelink_ros::setFrameRate::Request& req, pixelink_ros::s
     if(cam.setFrameRate(req.frameRate)){
       fps = req.frameRate;
       res.success = true;
-      return true;
+       return true;
     }
   }
   res.success=false;
