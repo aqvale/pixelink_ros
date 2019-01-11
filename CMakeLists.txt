@@ -11,13 +11,13 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
-set(PXL_LIB_PATH $ENV{PIXELINK_SDK_LIB})
-set(PXL_INC $ENV{PIXELINK_SDK_INC})
+set(PXL_LIB_PATH ${PROJECT_SOURCE_DIR}/third_party/)#$ENV{PIXELINK_SDK_LIB})
+#set(PXL_INC $ENV{PIXELINK_SDK_INC})
 
 find_library(PXL_LIB PATHS ${PXL_LIB_PATH} NAMES PxLApi)
-if(NOT ${PXL_INC_PATH})
-  set(PXL_INC ${PROJECT_SOURCE_DIR}/third_party/include)
-endif()
+#if(NOT ${PXL_INC_PATH})
+set(PXL_INC ${PROJECT_SOURCE_DIR}/third_party/include)
+#endif()
 
 message(${PXL_LIB})
 message(${PXL_LIB_PATH})
