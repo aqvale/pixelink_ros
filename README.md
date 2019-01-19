@@ -9,3 +9,10 @@ Download the [Pixelink drivers](https://storage.googleapis.com/files.pixelink.co
 Decompress them inside a folder and follow the installation instructions, except use `LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$PIXELINK_SDK_LIB` when the time comes.
 
 Ultimately, you will need to have PIXELINK_SDK_INC and PIXELINK_SDK_LIB defined as environment variables. 
+
+
+# To run
+First, you must be running `roscore` in a terminal
+In a new terminal, run `rosrun pixelink_ros pixelink_node`
+To view the video, run `rosrun image_view image_view /pixelink/image`
+If image_view is not installed, use `sudo apt-get install ros-melodic-image-view`
