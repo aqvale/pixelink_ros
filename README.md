@@ -16,6 +16,6 @@ First, you must be running `roscore` in a terminal
 
 In a new terminal, run `rosrun pixelink_ros pixelink_node`
 
-To view the video, run `rosrun image_view image_view /pixelink/image`
+To view the video, run `rosrun image_view image_view image:=/pixelink/image`
 
 If image_view is not installed, use `sudo apt-get install ros-melodic-image-view`
