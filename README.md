@@ -13,10 +13,10 @@ Ultimately, you will need to have PIXELINK_SDK_INC and PIXELINK_SDK_LIB defined 
 ## For Ubuntu 18.04
 #### In terminal:
 sudo vim /etc/apt/sources.list
-### Add in the lines:
+#### Add in the lines:
 deb http://us.archive.ubuntu.com/ubuntu/ xenial main restricted
 deb http://us.archive.ubuntu.com/ubuntu/ xenial universe
-### Back in terminal:
+#### Back in terminal:
 sudo apt-get install ffmpeg=7:2.8.6-1ubuntu2
 
 If you're having issues still, try using 
