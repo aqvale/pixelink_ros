@@ -22,7 +22,9 @@ sudo apt-get install ffmpeg=7:2.8.6-1ubuntu2
 If you're having issues still, try using 
 
 `sudo apt-get purge ffmpeg
+
  sudo apt autoremove
+ 
  sudo apt-get install ffmpeg=7:2.8.6-1ubuntu2`
 
 # To run
