@@ -169,7 +169,12 @@ int main(int argc, char** argv){
     // Get next frame
     FRAME_DESC desc;
     desc.uSize = sizeof(FRAME_DESC);
-    cam.getNextFrame(&desc,)
+    if(!(cam.getNextFrame(&desc,&frameBuf[0]))){
+      ROS_INFO("Skipped frame");
+      ros::spinOnce();
+      rate.sleep();
+      continue;
+    }
     
     
 
