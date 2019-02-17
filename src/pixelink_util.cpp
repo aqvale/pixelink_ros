@@ -144,6 +144,20 @@ int PxlCamera::getAssocPxlFormat(std::string rosFormat){
   }
   return -1;
 }
+
+double PxlCamera::getCurrentTimeStamp(){
+  double time;
+  PxLGetCurrentTimeStamp(hCamera,&time);
+  return time;
+}
+bool PxlCamera::getNextFrame(FRAME_DESC* desc, std::vector<uint8_t> frameBuf){
+  retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],&desc);
+  if(!API_SUCCESS(retCode)){
+    printf(" Error: Failed to obtain frame %x\n",retCode);
+    return -1;
+  }
+}
+
 bool PxlCamera::hasRosFormat(std::string rosFormat){
   return getAssocPxlFormat(rosFormat) == 0;
 }

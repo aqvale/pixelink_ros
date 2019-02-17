@@ -156,16 +156,22 @@ int main(int argc, char** argv){
   ROS_INFO("ROS Image Transport publisher/services set up successfully");
   
   //Begin looping
+  double timeDiff = 0;
+  int counter = 24*fps;
   ros::Rate rate(fps);
   while(ros::ok()){
+    // If necessary, get current time on camera
+    if(counter/fps>=24){// Keep to within 1 ms per minute clock error
+      double timeCurr = (ros::Time::now()).toSec();
+      double timeCam = cam.getCurrentTimeStamp();
+      timeDiff = timeCurr - timeCam;
+    } 
     // Get next frame
     FRAME_DESC desc;
     desc.uSize = sizeof(FRAME_DESC);
-    retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],&desc);
-    if(!API_SUCCESS(retCode)){
-      printf(" Error: Failed to obtain frame %x\n",retCode);
-      return -1;
-    }
+    cam.getNextFrame(&desc,)
+    
+    
 
     // convert to image_transport
     // uint32_t bytesToWrite = 0;
@@ -186,7 +192,7 @@ int main(int argc, char** argv){
     msg.is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;
-    header.stamp = ros::Time::now();
+    header.stamp = timeDiff + desc.dFrameTime;
     header.frame_id = "0";
     msg.header = header;
     // Send frame

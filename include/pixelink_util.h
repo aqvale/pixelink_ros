@@ -58,6 +58,7 @@ public:
   std::set<StreamFormat> getStreamFormats();
   std::string getAssocRosFormat(int pxlFormat);
   int getAssocPxlFormat(std::string rosFormat);
+  double getCurrentTimeStamp();
   bool hasRosFormat(std::string rosFormat);
   bool hasPxlFormat(int pxlFormat);
   bool hasFormat(StreamFormat sf);
