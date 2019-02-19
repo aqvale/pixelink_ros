@@ -152,6 +152,8 @@ double PxlCamera::getCurrentTimeStamp(){
 }
 bool PxlCamera::getNextFrame(FRAME_DESC* desc, std::vector<uint8_t> frameBuf){
   int retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],desc);
+
+
   if(!API_SUCCESS(retCode)){
     printf(" Error: Failed to obtain frame %x\n",retCode);
     return -1;
