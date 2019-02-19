@@ -169,7 +169,7 @@ int main(int argc, char** argv){
     // Get next frame
     FRAME_DESC desc;
     desc.uSize = sizeof(FRAME_DESC);
-    cam.getNextFrame(&desc,)
+    cam.getNextFrame(&desc,frameBuf);
     
     
 
@@ -192,7 +192,7 @@ int main(int argc, char** argv){
     msg.is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;
-    header.stamp = timeDiff + desc.dFrameTime;
+    header.stamp = ros::Time(timeDiff + desc.dFrameTime);
     header.frame_id = "0";
     msg.header = header;
     // Send frame

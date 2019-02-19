@@ -147,11 +147,11 @@ int PxlCamera::getAssocPxlFormat(std::string rosFormat){
 
 double PxlCamera::getCurrentTimeStamp(){
   double time;
-  PxLGetCurrentTimeStamp(hCamera,&time);
+  PxLGetCurrentTimestamp(hCamera,&time);
   return time;
 }
 bool PxlCamera::getNextFrame(FRAME_DESC* desc, std::vector<uint8_t> frameBuf){
-  retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],&desc);
+  int retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],desc);
   if(!API_SUCCESS(retCode)){
     printf(" Error: Failed to obtain frame %x\n",retCode);
     return -1;

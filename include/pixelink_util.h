@@ -4,6 +4,7 @@
 #include <set>
 #include <math.h>
 #include <string>
+#include <vector>
 
 #define YUV422 StreamFormat(PIXEL_FORMAT_YUV422,std::string("yuv422"))
 #define RGB24 StreamFormat(PIXEL_FORMAT_RGB24_NON_DIB,std::string("8UC3"))
@@ -59,6 +60,7 @@ public:
   std::string getAssocRosFormat(int pxlFormat);
   int getAssocPxlFormat(std::string rosFormat);
   double getCurrentTimeStamp();
+  bool getNextFrame(FRAME_DESC * desc, std::vector<uint8_t> frameBuf);
   bool hasRosFormat(std::string rosFormat);
   bool hasPxlFormat(int pxlFormat);
   bool hasFormat(StreamFormat sf);
