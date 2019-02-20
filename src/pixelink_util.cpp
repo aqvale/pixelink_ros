@@ -25,11 +25,11 @@ bool PxlCamera::setFrameRate(float value){
   return API_SUCCESS(retCode);
 }
 bool PxlCamera::setBaseParams(){
-  const float exposure = 40;
-  const float gain = 11.4;
-  const float gamma = 2.18;
+  const float exposure = 30;
+  const float gain = 1.8;
+  const float gamma = 2.192;
   const float temp = 5000;
-  const float balance[3] = {1,1.062,3.352};// RGB
+  const float balance[3] = {1.336,1.000,2.887};// RGB
   uint32_t numVals = 1;
   int retCode = PxLSetFeature(hCamera,FEATURE_EXPOSURE,FEATURE_FLAG_MANUAL,numVals,&exposure);
   retCode = PxLSetFeature(hCamera,FEATURE_GAIN,FEATURE_FLAG_MANUAL,numVals,&gain);
@@ -150,14 +150,15 @@ double PxlCamera::getCurrentTimeStamp(){
   PxLGetCurrentTimestamp(hCamera,&time);
   return time;
 }
-bool PxlCamera::getNextFrame(FRAME_DESC* desc, std::vector<uint8_t> frameBuf){
-  int retCode = PxLGetNextFrame(hCamera,frameBuf.size(),&frameBuf[0],desc);
+bool PxlCamera::getNextFrame(FRAME_DESC* desc, uint8_t* frameBuf, int size){
+  int retCode = PxLGetNextFrame(hCamera,size,frameBuf,desc);
 
 
   if(!API_SUCCESS(retCode)){
     printf(" Error: Failed to obtain frame %x\n",retCode);
-    return -1;
+    return false;
   }
+  return true;
 }
 
 bool PxlCamera::hasRosFormat(std::string rosFormat){

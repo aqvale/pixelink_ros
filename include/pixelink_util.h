@@ -60,7 +60,7 @@ public:
   std::string getAssocRosFormat(int pxlFormat);
   int getAssocPxlFormat(std::string rosFormat);
   double getCurrentTimeStamp();
-  bool getNextFrame(FRAME_DESC * desc, std::vector<uint8_t> frameBuf);
+  bool getNextFrame(FRAME_DESC * desc, uint8_t* frameBuf,int size);
   bool hasRosFormat(std::string rosFormat);
   bool hasPxlFormat(int pxlFormat);
   bool hasFormat(StreamFormat sf);
