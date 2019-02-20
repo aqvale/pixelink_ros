@@ -1,5 +1,5 @@
 # pixelink_ros
-Disclaimer: Provided as is, if you use this and something bad happens, it's not our fault
+Connects PixeLINK API with ROS.
 
 # To install
 Of course, install ROS
