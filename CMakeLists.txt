@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(pixelink_ros)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11 -g -Wall)
+add_compile_options(-std=c++11 -lusb -g -Wall)
 
 find_package(catkin REQUIRED COMPONENTS
   image_transport
@@ -56,7 +56,7 @@ add_executable(pixelink_node
 
 set(EXEC_LIST pixelink_node)
 foreach(EXEC_FILE ${EXEC_LIST})
-  target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} ${PXL_LIB})
+  target_link_libraries(${EXEC_FILE} ${catkin_LIBRARIES} ${PXL_LIB} usb-1.0)
   add_dependencies(${EXEC_FILE} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
   install(TARGETS ${EXEC_FILE}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

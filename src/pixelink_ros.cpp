@@ -12,6 +12,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/Image.h>
 #include <image_transport/image_transport.h>
+//#include <image_transport/image_transport_plugins.h>
 #include "pixelink_ros/setFrameRate.h"
 #include "pixelink_ros/setROI.h"
 #include "pixelink_ros/setOutputFormat.h"
@@ -137,11 +138,12 @@ int main(int argc, char** argv){
 
   ROS_INFO("Camera Initialized");
   ROS_INFO_STREAM("Properties: FPS = "<<fps<<"\n\t\twidth = "<<width<<"\n\t\theight="<<height);
-
+  ROS_INFO("Creating image transport");
   //Initialize ROS image transport stuff
-  //image_transport::ImageTransport it(nh);
-  //image_transport::Publisher pub = it.advertise("image",2);
-  ros::Publisher pub = nh.advertise<sensor_msgs::Image>("/pixelink/image",2);
+  image_transport::ImageTransport it(nh);
+  image_transport::Publisher pub = it.advertise("/pixelink/image",1);
+  ROS_INFO("Image Transport created");
+//  ros::Publisher pub = nh.advertise<sensor_msgs::Image>("/pixelink/image",1);
   ros::ServiceServer frameRateServer = nh.advertiseService("/pixelink/setFrameRate",callbackFrameRate);
   ros::ServiceServer setROIServer = nh.advertiseService("/pixelink/setROI",callbackSetROI);
   ros::ServiceServer streamFormatServer = nh.advertiseService("/pixelink/setStreamFormat",callbackStreamFormat);
@@ -188,19 +190,19 @@ int main(int argc, char** argv){
     //   printf(" Error: Failed to convert frame %x\n",retCode);
     //   return -1;
     // }
-    sensor_msgs::Image msg;
-    msg.width = width;
-    msg.height = height;
-    msg.step = frameBuf.size()/height;//3 for rgba
-    msg.data.resize(frameBuf.size());
-    memcpy(&(msg.data[0]),&frameBuf[0],frameBuf.size());
-    msg.encoding = outputFormat.getRosFormat();// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
-    msg.is_bigendian = 0;
+    sensor_msgs::ImagePtr msg;
+    msg->width = width;
+    msg->height = height;
+    msg->step = frameBuf.size()/height;//3 for rgba
+    msg->data.resize(frameBuf.size());
+    memcpy(&(msg->data[0]),&frameBuf[0],frameBuf.size());
+    msg->encoding = outputFormat.getRosFormat();// note, this can also be yuv422 or bayer: http://docs.ros.org/jade/api/sensor_msgs/html/namespacesensor__msgs_1_1image__encodings.html
+    msg->is_bigendian = 0;
     std_msgs::Header header;
     header.seq = count++;
     header.stamp = ros::Time(timeDiff + desc.dFrameTime);
     header.frame_id = "0";
-    msg.header = header;
+    msg->header = header;
     // Send frame
     pub.publish(msg);
     ros::spinOnce();
